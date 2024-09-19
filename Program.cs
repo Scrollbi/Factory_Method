@@ -1,4 +1,4 @@
-﻿using Factory_Method;
+using Factory_Method;
 using System;
 using System.Collections.Generic;
 using System.Reflection.PortableExecutable;
@@ -14,6 +14,26 @@ namespace Program
         public virtual void Write()
         {
             
+        }
+        public static Class_1 Read(string line)
+        {
+            string[] parts = line.Split(',');
+            if (parts[0] == "Student")
+            {
+                return Student.Read(parts);
+            }
+            else if (parts[0] == "Teacher")
+            {
+                return Teacher.Read(parts);
+            }
+            else if (parts[0] == "Course")
+            {
+                return Course.Read(parts);
+            }
+            else
+            {
+                throw new Exception("error");
+            }
         }
     }
     public abstract class Class
@@ -40,7 +60,7 @@ namespace Program
     {
         static void Main(string[] args)
         {
-            Read read = new Read();
+            
 
 
             Student student1 = Class.CreateStudent(1, "студент 1");
@@ -63,28 +83,31 @@ namespace Program
             teacher2.Write();
             course1.Write();
 
-            List<Student> students = read.ReadStudents();
-            List<Teacher> teachers = read.ReadTeachers();
-            List<Course> courses = read.ReadCourses();
-
-            Console.WriteLine("Студенты:");
-            foreach (Student student in students)
+            List<Class_1> objects = new List<Class_1>();
+            using (StreamReader reader = new StreamReader("data.txt"))
             {
-                Console.WriteLine($"Имя: {student.Name}, ID: {student.Id}, Курсы: {string.Join(", ", student.Courses)}");
+                string line;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    objects.Add(Class_1.Read(line));
+                }
             }
-
-            Console.WriteLine("Преподаватели:");
-            foreach (Teacher teacher in teachers)
+            
+            foreach (Class_1 obj in objects)
             {
-                Console.WriteLine($"Имя: {teacher.Name}, ID: {teacher.Id}, Опыт: {teacher.Exp}, Курсы: {string.Join(", ", teacher.Courses)}");
+                if (obj is Student student)
+                {
+                    Console.WriteLine($"Имя: {student.Name}, ID: {student.Id}, Курсы: {string.Join(", ", student.Courses)}");
+                }
+                else if (obj is Teacher teacher)
+                {
+                    Console.WriteLine($"Имя: {teacher.Name}, ID: {teacher.Id}, Опыт: {teacher.Exp}, Курсы: {string.Join(", ", teacher.Courses)}");
+                }
+                else if (obj is Course course)
+                {
+                    Console.WriteLine($"Название: {course.Name}, ID: {course.Id}, Преподаватель: {course.Teacher_Id}, Студенты: {string.Join(", ", course.Students)}");
+                }
             }
-
-            Console.WriteLine("Курсы:");
-            foreach (Course course in courses)
-            {
-                Console.WriteLine($"Название: {course.Name}, ID: {course.Id}, Преподаватель: {course.Teacher_Id}, Студенты: {string.Join(", ", course.Students)}");
-            }
-
         }
         
 
